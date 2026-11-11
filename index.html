@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Sweet Saga</title>
+<meta name="description" content="Permainan match-3 bergaya Candy Crush.">
+<meta name="theme-color" content="#2d1b5e">
+<!-- iOS: jalan sebagai aplikasi layar penuh setelah "Add to Home Screen" -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sweet Saga">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- ============ PETA LEVEL ============ -->
+<section id="screen-map" class="screen show">
+  <div class="map-top">
+    <div class="map-spacer"></div>
+    <div class="logo">Sweet <span>Saga</span></div>
+    <div class="map-tools">
+      <button class="icon" id="mSound">🔊</button>
+      <button class="icon" id="mReset" title="Hapus progres">⟲</button>
+    </div>
+  </div>
+  <div class="epbar">
+    <button class="icon" id="epPrev">‹</button>
+    <div class="epinfo">
+      <b id="epName">Lembah Permen</b>
+      <span id="epMeta">Episode 1</span>
+    </div>
+    <button class="icon" id="epNext">›</button>
+  </div>
+
+  <div class="map-scroll" id="mapScroll">
+    <div class="map-inner" id="mapInner">
+      <svg id="mapPath" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="mapNodes"></div>
+    </div>
+  </div>
+
+  <div class="jumpbar">
+    <span class="jl">Lompat ke level</span>
+    <input id="jumpN" type="number" min="1" max="10000" inputmode="numeric" placeholder="1–10000">
+    <button class="icon" id="jumpGo">→</button>
+  </div>
+</section>
+
+<!-- ============ PERMAINAN ============ -->
+<section id="screen-game" class="screen">
+  <div class="hud">
+    <button class="icon ghost" id="btnBack">‹</button>
+    <div class="hud-mid">
+      <div class="hud-row">
+        <div class="scorebox"><span class="lbl">Skor</span><b id="hScore">0</b></div>
+        <div class="objective" id="hObjective"></div>
+      </div>
+      <div class="starbar">
+        <div class="track"><i id="hBar"></i></div>
+        <div class="notch" id="n0" style="left:25%"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7-6.2-3.4L5.8 21l1.3-7L2 9.4l7-.9z"/></svg></div>
+        <div class="notch" id="n1" style="left:60%"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7-6.2-3.4L5.8 21l1.3-7L2 9.4l7-.9z"/></svg></div>
+        <div class="notch" id="n2" style="left:97%"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7-6.2-3.4L5.8 21l1.3-7L2 9.4l7-.9z"/></svg></div>
+      </div>
+    </div>
+    <div class="movesbox"><span class="lbl">Langkah</span><b id="hMoves">25</b></div>
+  </div>
+
+  <div class="boardwrap" id="boardwrap">
+    <div class="boardframe" id="boardframe">
+      <canvas id="board"></canvas>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+
+  <div class="dock">
+    <button class="booster" id="bHammer" title="Palu lolipop — hancurkan satu petak">
+      <canvas class="bico" width="96" height="96"></canvas>
+      <span class="cnt">0</span>
+    </button>
+    <button class="booster" id="bSwitch" title="Tukar bebas — tukar dua permen tanpa perlu match">
+      <canvas class="bico" width="96" height="96"></canvas>
+      <span class="cnt">0</span>
+    </button>
+    <div class="levelchip">Level <b id="hLevel">1</b></div>
+    <button class="icon ghost" id="btnHint" title="Petunjuk">💡</button>
+    <button class="icon ghost" id="btnSound2">🔊</button>
+  </div>
+</section>
+
+<!-- ============ POPUP ============ -->
+<div class="modal" id="modal">
+  <div class="card" id="card"></div>
+</div>
+
+<script src="js/levels.js"></script>
+<script src="js/art.js"></script>
+<script src="js/game.js"></script>
+<script>
+/* Service worker: menyimpan permainan agar bisa dimainkan tanpa internet.
+   Hanya aktif kalau dibuka lewat http/https (bukan file://). */
+if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
