@@ -1,16 +1,16 @@
-﻿/* ============================================================
-   SWEET SAGA â€” mesin permainan
+/* ============================================================
+   SWEET SAGA — mesin permainan
    Aturan mengikuti Candy Crush Saga: papan 9x9, permen spesial
    (garis / bungkus / bom warna), kombinasi, cascade, jelly, icing,
    cokelat, licorice, bahan, order, Sugar Crush, dan bintang.
-   (Sistem nyawa sengaja tidak dipakai â€” main sepuasnya.)
+   (Sistem nyawa sengaja tidak dipakai — main sepuasnya.)
    ============================================================ */
 (function (CC) {
 'use strict';
 
-/* Dinaikkan tiap kali kode diterbitkan â€” ditampilkan di bawah peta supaya
+/* Dinaikkan tiap kali kode diterbitkan — ditampilkan di bawah peta supaya
    ketahuan apakah perangkat sudah memakai versi terbaru. */
-CC.BUILD = 'r6 Â· 11 Nov';
+CC.BUILD = 'r7 · 11 Nov';
 
 const ROWS = 9, COLS = 9;
 const ORTHO = [[-1,0],[1,0],[0,-1],[0,1]];
@@ -371,7 +371,7 @@ function evalSwap(r,c,r2,c2){
 }
 let jellyUrgency = 1;
 function bestMove(){
-  // makin sedikit jelly tersisa, makin mahal nilainya â€” supaya sisa terakhir dikejar
+  // makin sedikit jelly tersisa, makin mahal nilainya — supaya sisa terakhir dikejar
   // normal selama jelly masih banyak; baru jadi prioritas saat tinggal sedikit
   if (L && L.type === 'jelly'){
     const left = jellyLeft();
@@ -397,7 +397,7 @@ function permute(){
   list.forEach((t,i) => t.color = cols[i]);
 }
 async function shuffleBoard(){
-  toast('Tidak ada langkah! Mengacakâ€¦');
+  toast('Tidak ada langkah! Mengacak…');
   const list = allTiles();
   await tween(230, p => list.forEach(t => { t.scale = 1-.85*p; t.alpha = 1-.6*p; t.rot = p*3; }));
   let guard = 0;
@@ -450,7 +450,7 @@ function orderCombo(name){
 function jellyLeft(){ let n=0; for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) n+=jelly[r][c]; return n; }
 function ordersDone(){ return orders.every(o => o.got >= o.count); }
 function goalMet(){
-  // Target adalah target. Begitu tercapai, level selesai â€” sama seperti level
+  // Target adalah target. Begitu tercapai, level selesai — sama seperti level
   // jelly/bahan/order. Sisa langkah berubah jadi poin lewat Sugar Crush, jadi
   // makin cepat target dicapai makin banyak bintang yang didapat.
   if (L.type === 'score')      return score >= L.target;
@@ -1096,7 +1096,7 @@ function levelComplete(){
     <div class="bigstars">${[0,1,2].map(i=>`<i class="${i<st?'on':''}"></i>`).join('')}</div>
     <p class="big">${fmt(score)}</p>
     <p>${st===3?'Sempurna! Tiga bintang penuh.':'Bintang berikutnya di '+fmt(L.stars[st]||L.stars[2])+' poin.'}</p>
-    ${got.length ? '<p style="color:#FFD21C;font-weight:800">ðŸŽ Dapat ' + got.join(' Â· ') + '</p>' : ''}
+    ${got.length ? '<p style="color:#FFD21C;font-weight:800">🎁 Dapat ' + got.join(' · ') + '</p>' : ''}
     <div class="acts">
       <button class="btn alt" data-act="map">Peta</button>
       ${levelNo < CC.TOTAL ? '<button class="btn" data-act="next">Lanjut</button>' : ''}
@@ -1136,7 +1136,7 @@ function resize(){
     bgW = nw; bgH = nh;
     bgcv.width = nw; bgcv.height = nh;
     // pemandangan diam digambar sekali ke kanvas terpisah, lalu tiap frame
-    // tinggal disalin dan ditimpa lapisan bergeraknya â€” jauh lebih ringan
+    // tinggal disalin dan ditimpa lapisan bergeraknya — jauh lebih ringan
     if (!bgStatic) bgStatic = document.createElement('canvas');
     bgStatic.width = nw; bgStatic.height = nh;
     CC.art.paintBackground(bgStatic.getContext('2d'), nw, nh);
@@ -1459,7 +1459,7 @@ function objectiveHtml(){
     wrap.appendChild(d);
   };
   if (L.type === 'score'){
-    add('ðŸŽ¯', fmt(L.target), score >= L.target);
+    add('🎯', fmt(L.target), score >= L.target);
   } else if (L.type === 'jelly'){
     const n = jellyLeft();
     add(miniCanvas(x => { CC.art.drawJelly(x, 2, 2, 2, 52, 0); }), n, n === 0);
@@ -1474,7 +1474,7 @@ function objectiveHtml(){
       else if (o.kind === 'special'){
         const sp = o.special === 'striped' ? 'striped-v' : o.special;
         node = miniCanvas(x => CC.art.drawCandy(x, { color:4, special:sp }, 28, 28, 56, 0));
-      } else node = 'âœ¨';
+      } else node = '✨';
       add(node, left, left === 0);
     });
   }
@@ -1550,7 +1550,7 @@ function buildMap(){
   const count = last - first + 1;
 
   $('epName').textContent = CC.episodeName(mapEp);
-  $('epMeta').textContent = 'Episode ' + (mapEp+1) + ' / ' + eps + ' Â· Level ' + first + 'â€“' + last;
+  $('epMeta').textContent = 'Episode ' + (mapEp+1) + ' / ' + eps + ' · Level ' + first + '–' + last;
   $('epPrev').disabled = mapEp === 0;
   $('epNext').disabled = mapEp >= eps-1;
 
@@ -1594,7 +1594,7 @@ function buildMap(){
                   (n === unlocked ? ' current' : '');
     b.style.left = p.x + 'px'; b.style.top = p.y + 'px';
     b.innerHTML =
-      '<div class="disc">' + (locked ? 'ðŸ”’' : n) + '</div>' +
+      '<div class="disc">' + (locked ? '🔒' : n) + '</div>' +
       '<div class="stars">' + [0,1,2].map(k => '<i class="' + (k<st?'on':'') + '"></i>').join('') + '</div>' +
       (n === unlocked ? '<div class="flag">MAIN</div>' : '');
     if (!locked) b.onclick = () => openLevel(n);
@@ -1649,10 +1649,10 @@ async function startLevel(n){
 
 /* ===================== TOMBOL ===================== */
 function bindSound(btn){
-  btn.textContent = soundOn ? 'ðŸ”Š' : 'ðŸ”‡';
+  btn.textContent = soundOn ? '🔊' : '🔇';
   btn.onclick = () => {
     soundOn = !soundOn; DB.sound = soundOn;
-    document.querySelectorAll('#mSound,#btnSound2').forEach(b => b.textContent = soundOn ? 'ðŸ”Š' : 'ðŸ”‡');
+    document.querySelectorAll('#mSound,#btnSound2').forEach(b => b.textContent = soundOn ? '🔊' : '🔇');
     if (soundOn) SFX.pick();
   };
 }

@@ -110,8 +110,14 @@ Lalu di app *Files*: ketuk berkasnya → ketuk **Bagikan** → **Safari**
 ```
 node tools\icons.js     # bikin ulang ikon aplikasi
 node tools\build.js     # bikin ulang SweetSaga.html (versi satu berkas)
+node tools\shots.js     # potret tampilan (butuh: npm i puppeteer-core, server nyala)
 
-node _test\rules.js     # uji aturan permainan (24 uji)
+:: PENTING: jangan pernah menyunting berkas sumber lewat PowerShell
+:: Get-Content/Set-Content — itu merusak emoji dan tanda baca jadi mojibake.
+node tools\fix-encoding.js --tulis   # pemulih kalau terlanjur rusak
+
+node _test\encoding.js  # pastikan tidak ada berkas yang rusak encoding-nya
+node _test\rules.js     # uji aturan permainan (42 uji)
 node _test\gen.js       # periksa struktur seluruh 10.000 level
 node _test\harness.js   # mainkan 20 level buatan tangan sampai tuntas
 node _test\diag.js 4158 # bedah satu level: papan + jejak bahan per langkah
