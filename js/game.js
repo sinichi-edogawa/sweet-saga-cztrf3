@@ -8,6 +8,10 @@
 (function (CC) {
 'use strict';
 
+/* Dinaikkan tiap kali kode diterbitkan — ditampilkan di bawah peta supaya
+   ketahuan apakah perangkat sudah memakai versi terbaru. */
+CC.BUILD = 'r5 · 11 Nov';
+
 const ROWS = 9, COLS = 9;
 const ORTHO = [[-1,0],[1,0],[0,-1],[0,1]];
 const $ = id => document.getElementById(id);
@@ -1702,9 +1706,11 @@ function boot(){
     };
   };
 
+  $('buildline').textContent = 'versi ' + CC.BUILD;
   showMap();
   requestAnimationFrame(loop);
 }
+CC.isPlaying = () => playing;
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
 else boot();
 

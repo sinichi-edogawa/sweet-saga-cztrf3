@@ -55,6 +55,7 @@
     <input id="jumpN" type="number" min="1" max="10000" inputmode="numeric" placeholder="1–10000">
     <button class="icon" id="jumpGo">→</button>
   </div>
+  <div class="buildline" id="buildline"></div>
 </section>
 
 <!-- ============ PERMAINAN ============ -->
@@ -110,7 +111,22 @@
 /* Service worker: menyimpan permainan agar bisa dimainkan tanpa internet.
    Hanya aktif kalau dibuka lewat http/https (bukan file://). */
 if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .then(reg => {
+        reg.update();
+        setInterval(() => reg.update(), 60000);   // cek versi baru tiap menit
+      })
+      .catch(()=>{});
+  });
+  // Versi baru sudah aktif: muat ulang, tapi jangan saat sedang main.
+  let sudahMuatUlang = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (sudahMuatUlang) return;
+    if (window.CC && CC.isPlaying && CC.isPlaying()) return;
+    sudahMuatUlang = true;
+    location.reload();
+  });
 }
 </script>
 </body>

@@ -1,5 +1,13 @@
-﻿/* Service worker: simpan semua berkas supaya permainan bisa dibuka tanpa internet. */
-const CACHE = 'sweet-saga-v2';
+/* Service worker.
+   Tujuannya dua: permainan bisa dibuka tanpa internet, TAPI versi baru harus
+   benar-benar sampai ke pemain.
+
+   Versi sebelumnya memakai cache-first untuk semua berkas, akibatnya kode lama
+   terkunci selamanya di perangkat. Sekarang:
+     - kode (html/js/css/json)  -> jaringan dulu, simpanan sebagai cadangan
+     - gambar/ikon              -> simpanan dulu (jarang berubah, hemat kuota)
+*/
+const CACHE = 'sweet-saga-v3';
 const FILES = [
   './',
   './index.html',
@@ -29,20 +37,36 @@ self.addEventListener('activate', e => {
   );
 });
 
+const isCode = url =>
+  /\.(html|js|css|json|webmanifest)$/i.test(url.pathname) ||
+  url.pathname.endsWith('/');
+
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then(hit => {
-      if (hit) return hit;
-      return fetch(e.request).then(res => {
-        // simpan berkas sendiri yang berhasil diambil
-        if (res.ok && new URL(e.request.url).origin === location.origin){
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
-        }
-        return res;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
-});
+  const url = new URL(e.request.url);
+  if (url.origin !== location.origin) return;          // font dsb. biarkan apa adanya
 
+  const simpan = res => {
+    if (res && res.ok){
+      const copy = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, copy)).catch(()=>{});
+    }
+    return res;
+  };
+
+  if (isCode(url)){
+    // JARINGAN DULU: selalu dapat versi terbaru selama ada sinyal.
+    e.respondWith(
+      fetch(e.request, { cache: 'no-store' })
+        .then(simpan)
+        .catch(() => caches.match(e.request, { ignoreSearch: true })
+                       .then(hit => hit || caches.match('./index.html')))
+    );
+  } else {
+    // SIMPANAN DULU untuk gambar: isinya tidak berubah-ubah.
+    e.respondWith(
+      caches.match(e.request, { ignoreSearch: true })
+        .then(hit => hit || fetch(e.request).then(simpan))
+    );
+  }
+});
