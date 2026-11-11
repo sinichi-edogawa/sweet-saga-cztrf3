@@ -10,7 +10,7 @@
 
 /* Dinaikkan tiap kali kode diterbitkan — ditampilkan di bawah peta supaya
    ketahuan apakah perangkat sudah memakai versi terbaru. */
-CC.BUILD = 'r5 · 11 Nov';
+CC.BUILD = 'r6 · 11 Nov';
 
 const ROWS = 9, COLS = 9;
 const ORTHO = [[-1,0],[1,0],[0,-1],[0,1]];
@@ -1585,19 +1585,6 @@ function buildMap(){
     if (cur) $('mapScroll').scrollTop = Math.max(0, cur.y - ($('mapScroll').clientHeight||400)*0.6);
   }, 20);
 }
-function gotoLevel(n){
-  n = clamp(Math.round(n) || 1, 1, CC.TOTAL);
-  if (n > DB.unlocked){
-    mapEp = episodeOf(DB.unlocked); buildMap();
-    toast2('Level ' + n + ' belum terbuka. Kamu baru sampai level ' + DB.unlocked + '.');
-    return;
-  }
-  mapEp = episodeOf(n); buildMap();
-}
-function toast2(msg){
-  modal('<h2>Belum Terbuka</h2><p>' + msg + '</p>' +
-        '<div class="acts"><button class="btn" data-act="close">Oke</button></div>');
-}
 
 /* ===================== MEMBUKA LEVEL ===================== */
 function openLevel(n){
@@ -1675,9 +1662,6 @@ function boot(){
   bindSound($('mSound')); bindSound($('btnSound2'));
   $('epPrev').onclick = () => { if (mapEp > 0){ mapEp--; buildMap(); } };
   $('epNext').onclick = () => { if (mapEp < CC.episodeCount-1){ mapEp++; buildMap(); } };
-  const jump = () => { const v = +$('jumpN').value; if (v) gotoLevel(v); $('jumpN').blur(); };
-  $('jumpGo').onclick = jump;
-  $('jumpN').addEventListener('keydown', e => { if (e.key === 'Enter') jump(); });
   $('btnBack').onclick = () => {
     if (!playing) { showMap(); return; }
     modal(`<h2>Keluar level?</h2><p>Kemajuan di level ini akan hilang.</p>

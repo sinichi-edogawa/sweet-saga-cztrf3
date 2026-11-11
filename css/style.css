@@ -74,19 +74,7 @@ button{font-family:var(--font); cursor:pointer}
 .map-scroll{flex:1; overflow-y:auto; overflow-x:hidden; border-radius:18px;
   -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
 
-.jumpbar{display:flex; align-items:center; gap:8px; margin-top:8px}
-.jumpbar .jl{font-size:12px; font-weight:700; opacity:.9}
-.jumpbar input{
-  flex:1; min-width:0; height:40px; padding:0 12px; border-radius:13px;
-  border:2px solid var(--panel-d); background:rgba(58,31,92,.85); color:#fff;
-  font-family:var(--font); font-weight:800; font-size:15px; text-align:center;
-  -moz-appearance:textfield;
-}
-.jumpbar input::-webkit-outer-spin-button,
-.jumpbar input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
-.jumpbar input::placeholder{color:rgba(255,255,255,.45); font-weight:700}
-.jumpbar input:focus{outline:none; border-color:var(--gold)}
-.buildline{text-align:center; font-size:10px; font-weight:700; opacity:.55; padding-top:5px}
+.buildline{text-align:center; font-size:10px; font-weight:700; opacity:.55; padding-top:7px}
 .map-scroll::-webkit-scrollbar{width:0}
 .map-inner{position:relative; width:100%}
 #mapPath{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
