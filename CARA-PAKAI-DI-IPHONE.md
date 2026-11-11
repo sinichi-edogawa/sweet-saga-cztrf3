@@ -1,6 +1,26 @@
 # Sweet Saga — cara memainkannya di iPhone
 
-Ada tiga cara. Nomor 1 paling enak, nomor 3 paling simpel.
+## ✅ Sudah online di sini
+
+**https://sinichi-edogawa.github.io/sweet-saga-cztrf3/**
+
+Buka alamat itu di **Safari** di iPhone → tombol **Bagikan** → **Add to Home Screen**.
+Jadi ikon aplikasi, layar penuh, dan **jalan tanpa internet** setelah dibuka sekali.
+PC tidak perlu menyala.
+
+Untuk memperbarui setelah kodenya diubah:
+
+```
+git add -A
+git commit -m "pesan perubahan"
+git push
+```
+
+Tunggu ±1 menit, lalu di iPhone tutup aplikasinya dari app switcher dan buka lagi.
+
+---
+
+Cara-cara lain di bawah ini sudah tidak diperlukan, tapi dibiarkan sebagai cadangan.
 
 ---
 
