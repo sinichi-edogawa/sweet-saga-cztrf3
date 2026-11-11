@@ -939,7 +939,10 @@ function updateDock(){
     }
     const n = b[key] || 0;
     if (ref.cnt) ref.cnt.textContent = n;
-    ref.el.disabled = n <= 0 || !playing || busy;
+    // JANGAN ikut sertakan `busy` di sini: updateDock tidak dipanggil lagi saat
+    // animasi selesai, jadi tombolnya akan tersangkut abu-abu selamanya.
+    // Klik saat papan sibuk sudah ditolak di handler-nya.
+    ref.el.disabled = n <= 0 || !playing;
     ref.el.classList.toggle('on', armed === key);
   };
   set('bHammer', 'hammer', CC.art.drawHammerIcon);
@@ -1638,6 +1641,7 @@ async function startLevel(n){
   await wait(260);
   await resolve(null, null);
   busy = false;
+  updateDock();
   idleAt = performance.now();
 }
 
