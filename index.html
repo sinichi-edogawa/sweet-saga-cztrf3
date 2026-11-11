@@ -114,15 +114,31 @@ if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
       })
       .catch(()=>{});
   });
-  // Versi baru sudah aktif: muat ulang, tapi jangan saat sedang main.
-  let sudahMuatUlang = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (sudahMuatUlang) return;
-    if (window.CC && CC.isPlaying && CC.isPlaying()) return;
-    sudahMuatUlang = true;
-    location.reload();
-  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => muatUlangKalauBaru(true));
 }
+
+/* Pendeteksi versi.
+   Service worker saja tidak cukup: kalau yang berubah hanya js/css (bukan sw.js),
+   tidak ada pemicu apa pun, sehingga halaman yang sudah terbuka terus memakai
+   kode lama di memori. Jadi kita bandingkan sendiri dengan version.txt. */
+let sudahMuatUlang = false;
+function muatUlangKalauBaru(paksa){
+  if (sudahMuatUlang) return;
+  if (window.CC && CC.isPlaying && CC.isPlaying()) return;   // jangan ganggu permainan
+  if (paksa){ sudahMuatUlang = true; location.reload(); return; }
+  fetch('version.txt?t=' + Date.now(), { cache: 'no-store' })
+    .then(r => r.ok ? r.text() : null)
+    .then(v => {
+      if (!v || !window.CC || !CC.BUILD) return;
+      if (v.trim() !== CC.BUILD.trim()){ sudahMuatUlang = true; location.reload(); }
+    })
+    .catch(()=>{});
+}
+window.addEventListener('load', () => setTimeout(muatUlangKalauBaru, 1500));
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) muatUlangKalauBaru();
+});
+setInterval(muatUlangKalauBaru, 120000);
 </script>
 </body>
 </html>

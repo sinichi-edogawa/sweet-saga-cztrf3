@@ -10,7 +10,7 @@
 
 /* Dinaikkan tiap kali kode diterbitkan — ditampilkan di bawah peta supaya
    ketahuan apakah perangkat sudah memakai versi terbaru. */
-CC.BUILD = 'r7 · 11 Nov';
+CC.BUILD = 'r8 · 11 Nov';
 
 const ROWS = 9, COLS = 9;
 const ORTHO = [[-1,0],[1,0],[0,-1],[0,1]];

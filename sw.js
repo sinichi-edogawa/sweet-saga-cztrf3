@@ -45,6 +45,7 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;          // font dsb. biarkan apa adanya
+  if (url.pathname.endsWith('version.txt')) return;    // penanda versi: selalu langsung ke jaringan
 
   const simpan = res => {
     if (res && res.ok){
