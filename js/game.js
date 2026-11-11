@@ -446,8 +446,10 @@ function orderCombo(name){
 function jellyLeft(){ let n=0; for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++) n+=jelly[r][c]; return n; }
 function ordersDone(){ return orders.every(o => o.got >= o.count); }
 function goalMet(){
-  // level skor klasik: semua langkah harus dipakai dulu
-  if (L.type === 'score')      return moves <= 0 && score >= L.target;
+  // Level skor: biasanya semua langkah dipakai untuk mengejar bintang. Tapi begitu
+  // bintang ketiga didapat tidak ada lagi yang bisa dikejar, jadi langsung selesai.
+  if (L.type === 'score')
+    return score >= L.target && (moves <= 0 || score >= L.stars[2]);
   if (L.type === 'jelly')      return jellyLeft() === 0;
   if (L.type === 'ingredient') return ingrCollected >= ingrTotal;
   if (L.type === 'order')      return ordersDone();
@@ -983,7 +985,7 @@ async function endOfMove(isMove){
     targetHit = true;
     const next = L.stars.filter(v => v > score)[0];
     praise('Target!');
-    toast(next ? 'Target aman! Bintang berikutnya di ' + fmt(next) + ' poin'
+    toast(next ? 'Target aman! Lanjut kejar bintang, atau tekan Selesai'
                : 'Target aman! Tiga bintang sudah di tangan');
     SFX.star(0);
   }
@@ -1486,7 +1488,13 @@ function updateHud(){
   $('hScore').textContent = fmt(score);
   $('hMoves').textContent = moves;
   document.querySelector('.movesbox').classList.toggle('low', moves <= 5);
-  $('hLevel').textContent = levelNo;
+
+  // chip tengah: jadi tombol "Selesai" kalau target skor sudah aman,
+  // supaya sisa langkah tidak wajib dihabiskan
+  const chip = $('levelchip');
+  const canFinish = playing && L.type === 'score' && moves > 0 && score >= L.target;
+  chip.classList.toggle('finish', canFinish);
+  chip.innerHTML = canFinish ? 'Selesai sekarang ✓' : 'Level <b>' + levelNo + '</b>';
   const o = $('hObjective'); o.innerHTML = ''; o.appendChild(objectiveHtml());
   // Bar bertahap seperti aslinya: bintang 1 selalu di 25%, bintang 2 di 60%,
   // bintang 3 di ujung. Tanpa ini, target yang kecil cuma mengisi beberapa persen
@@ -1693,6 +1701,13 @@ function boot(){
       <button class="btn alt" data-act="quit">Keluar</button></div>`);
     $('card').querySelector('[data-act="none"]').onclick = closeModal;
     $('card').querySelector('[data-act="quit"]').onclick = () => { closeModal(); showMap(); };
+  };
+  $('levelchip').onclick = async () => {
+    if (!playing || busy || !L) return;
+    if (!(L.type === 'score' && moves > 0 && score >= L.target)) return;
+    busy = true; armed = null; selected = null;
+    await sugarCrush();                // sisa langkah tetap jadi poin bonus
+    busy = false;
   };
   $('bHammer').onclick = () => { if (playing && !busy) setArmed('hammer'); };
   $('bSwitch').onclick = () => { if (playing && !busy) setArmed('swap'); };

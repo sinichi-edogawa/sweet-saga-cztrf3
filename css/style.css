@@ -178,9 +178,20 @@ button{font-family:var(--font); cursor:pointer}
 .dock{display:flex; align-items:center; gap:7px; padding-top:9px}
 .levelchip{
   flex:1; min-width:0; text-align:center; padding:9px; border-radius:14px;
-  font-weight:800; font-size:15px; white-space:nowrap;
+  font-weight:800; font-size:15px; white-space:nowrap; color:var(--ink);
+  font-family:var(--font); cursor:default;
   background:var(--panel); border:2px solid var(--panel-d); box-shadow:0 4px 0 #35195c;
+  transition:.1s;
 }
+/* berubah jadi tombol "Selesai" begitu target skor sudah aman */
+.levelchip.finish{
+  cursor:pointer; color:#0f3d1e;
+  background:linear-gradient(180deg,#8CF0A4,#3FC767);
+  border-color:#1d7a39; box-shadow:0 4px 0 #15642c;
+  animation:fpulse 1.1s ease-in-out infinite;
+}
+.levelchip.finish:active{transform:translateY(3px); box-shadow:0 1px 0 #15642c; animation:none}
+@keyframes fpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
 
 /* ---------- booster ---------- */
 .booster{
