@@ -356,7 +356,21 @@ CC.LEVELS = [
     {kind:'color',   color:3,             count:35} ] },
 ];
 
-CC.LEVELS.forEach((L, i) => { L.n = i + 1; if (!L.jelly) L.jelly = none; });
+/* Pada level skor, ambang bintang diturunkan langsung dari targetnya:
+   target = 1 bintang, 2,5x target = 2 bintang, 5x target = 3 bintang.
+   Level berhenti tepat di target, lalu sisa langkah diubah jadi poin oleh
+   Sugar Crush — jadi makin cepat target dicapai, makin banyak bintangnya. */
+function starsFromTarget(t){
+  const r = v => Math.round(v / 500) * 500;
+  return [t, r(t * 2.5), r(t * 5)];
+}
+CC.starsFromTarget = starsFromTarget;
+
+CC.LEVELS.forEach((L, i) => {
+  L.n = i + 1;
+  if (!L.jelly) L.jelly = none;
+  if (L.type === 'score') L.stars = starsFromTarget(L.target);
+});
 
 /* ============================================================
    GENERATOR LEVEL  —  level 21 sampai 10.000
@@ -721,7 +735,7 @@ function generate(n){
 
   /* --- target skor & ambang bintang --- */
   const perMove = colors === 5 ? 560 : 430;
-  let target = 0, s1;
+  let target = 0, s1, starList = null;
   if (type === 'score'){
     // target dibuat konservatif: papan sempit atau penuh penghalang jauh lebih sulit
     // mencetak skor. Tantangan sebenarnya ada di ambang bintang 2 dan 3.
@@ -730,6 +744,7 @@ function generate(n){
     target = Math.max(2500,
       Math.round(moves * perMove * (0.45 + d*0.30) * density * density * squeeze / 500) * 500);
     s1 = target;
+    starList = starsFromTarget(target);
   } else if (type === 'jelly'){
     s1 = Math.round((22000 + layers * 430) / 500) * 500;
   } else if (type === 'ingredient'){
@@ -737,7 +752,8 @@ function generate(n){
   } else {
     s1 = Math.round((moves * 1250) / 500) * 500;
   }
-  const stars = [s1, Math.round(s1*1.95/500)*500, Math.round(s1*2.95/500)*500];
+  const stars = starList ||
+    [s1, Math.round(s1*1.95/500)*500, Math.round(s1*2.95/500)*500];
 
   const L = {
     n, type, moves, colors, stars,

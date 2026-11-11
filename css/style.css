@@ -183,15 +183,6 @@ button{font-family:var(--font); cursor:pointer}
   background:var(--panel); border:2px solid var(--panel-d); box-shadow:0 4px 0 #35195c;
   transition:.1s;
 }
-/* berubah jadi tombol "Selesai" begitu target skor sudah aman */
-.levelchip.finish{
-  cursor:pointer; color:#0f3d1e;
-  background:linear-gradient(180deg,#8CF0A4,#3FC767);
-  border-color:#1d7a39; box-shadow:0 4px 0 #15642c;
-  animation:fpulse 1.1s ease-in-out infinite;
-}
-.levelchip.finish:active{transform:translateY(3px); box-shadow:0 1px 0 #15642c; animation:none}
-@keyframes fpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12)}}
 
 /* ---------- booster ---------- */
 .booster{
