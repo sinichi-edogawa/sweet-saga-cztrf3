@@ -617,84 +617,294 @@ art.drawExit = function (ctx, x, y, S, t) {
 };
 
 /* ============================================================
-   LATAR  —  gaya papercraft datar
+   LATAR  —  negeri permen
+   paintBackground() menggambar pemandangan diam satu kali.
+   drawBackdropAnim() menggambar lapisan bergerak tiap frame.
    ============================================================ */
+
+/* --- awan gumpalan --- */
+function cloud(ctx, x, y, s, alpha){
+  ctx.save();
+  ctx.globalAlpha = alpha == null ? 1 : alpha;
+  const blobs = [[0,0,1],[0.82,0.16,0.72],[-0.84,0.18,0.66],[0.34,-0.38,0.70],[-0.42,-0.3,0.58]];
+  ctx.beginPath();
+  for (const b of blobs){
+    const bx = x + b[0]*s, by = y + b[1]*s;
+    ctx.moveTo(bx + b[2]*s, by);
+    ctx.arc(bx, by, b[2]*s, 0, Math.PI*2);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,0.92)';
+  ctx.fill();
+  // sisi bawah sedikit merona
+  ctx.save();
+  ctx.clip();
+  const g = ctx.createLinearGradient(0, y - s, 0, y + s*0.9);
+  g.addColorStop(0, 'rgba(255,255,255,0)');
+  g.addColorStop(1, 'rgba(255,214,235,0.75)');
+  ctx.fillStyle = g;
+  ctx.fillRect(x - s*2, y - s*2, s*4, s*4);
+  ctx.restore();
+  ctx.restore();
+}
+
+/* --- pohon lolipop --- */
+function lolli(ctx, x, y, r, c1, c2){
+  ctx.save();
+  // bayangan di tanah
+  ctx.fillStyle = 'rgba(120,60,130,0.14)';
+  ctx.beginPath(); ctx.ellipse(x, y + r*2.55, r*0.75, r*0.2, 0, 0, 7); ctx.fill();
+  // batang
+  ctx.strokeStyle = '#FFF7E8'; ctx.lineWidth = r*0.26; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(x, y + r*0.4); ctx.lineTo(x, y + r*2.45); ctx.stroke();
+  ctx.strokeStyle = 'rgba(190,160,120,0.55)'; ctx.lineWidth = r*0.06;
+  ctx.beginPath(); ctx.moveTo(x - r*0.07, y + r*0.6); ctx.lineTo(x - r*0.07, y + r*2.3); ctx.stroke();
+  // kepala
+  ctx.save();
+  ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.clip();
+  ctx.fillStyle = c1; ctx.fillRect(x-r, y-r, r*2, r*2);
+  ctx.fillStyle = c2;
+  ctx.beginPath();
+  for (let i=0;i<=120;i++){
+    const a = i/120 * Math.PI * 6.2;
+    const rr = r * (i/120) * 1.05;
+    const px = x + Math.cos(a)*rr, py = y + Math.sin(a)*rr;
+    i ? ctx.lineTo(px,py) : ctx.moveTo(px,py);
+  }
+  ctx.lineWidth = r*0.30; ctx.strokeStyle = c2; ctx.lineCap='round'; ctx.stroke();
+  ctx.restore();
+  // tepi + kilau
+  ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = r*0.13;
+  ctx.beginPath(); ctx.arc(x, y, r*0.94, 0, 7); ctx.stroke();
+  ctx.fillStyle = 'rgba(255,255,255,0.62)';
+  ctx.beginPath(); ctx.ellipse(x - r*0.36, y - r*0.42, r*0.3, r*0.17, -0.6, 0, 7); ctx.fill();
+  ctx.restore();
+}
+
+/* --- tongkat permen --- */
+function candyCane(ctx, x, y, h){
+  const w = h*0.17;
+  ctx.save();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const path = () => {
+    ctx.beginPath();
+    ctx.moveTo(x, y + h);
+    ctx.lineTo(x, y + h*0.42);
+    ctx.quadraticCurveTo(x, y, x + h*0.26, y);
+    ctx.quadraticCurveTo(x + h*0.5, y, x + h*0.5, y + h*0.26);
+  };
+  ctx.fillStyle = 'rgba(120,60,130,0.14)';
+  ctx.beginPath(); ctx.ellipse(x + h*0.1, y + h + w*0.3, h*0.3, h*0.07, 0, 0, 7); ctx.fill();
+  path(); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = w; ctx.stroke();
+  ctx.save(); path(); ctx.strokeStyle = '#FF5F8A'; ctx.lineWidth = w;
+  ctx.setLineDash([w*0.55, w*0.8]); ctx.stroke(); ctx.restore();
+  path(); ctx.strokeStyle = 'rgba(190,120,150,0.4)'; ctx.lineWidth = w*0.1; ctx.stroke();
+  ctx.restore();
+}
+
+/* --- gumdrop --- */
+function gumdrop(ctx, x, y, r, col, dark){
+  ctx.save();
+  ctx.fillStyle = 'rgba(120,60,130,0.14)';
+  ctx.beginPath(); ctx.ellipse(x, y + r*0.08, r*0.95, r*0.16, 0, 0, 7); ctx.fill();
+  const g = ctx.createLinearGradient(x - r, y - r, x + r*0.6, y);
+  g.addColorStop(0, col); g.addColorStop(1, dark);
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(x - r, y);
+  ctx.bezierCurveTo(x - r*0.95, y - r*1.25, x + r*0.95, y - r*1.25, x + r, y);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.beginPath(); ctx.ellipse(x - r*0.3, y - r*0.6, r*0.26, r*0.14, -0.5, 0, 7); ctx.fill();
+  // butiran gula
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  for (let i=0;i<7;i++){
+    const a = Math.PI + i*(Math.PI/6.5);
+    ctx.beginPath(); ctx.arc(x + Math.cos(a)*r*0.78, y + Math.sin(a)*r*0.78, r*0.07, 0, 7); ctx.fill();
+  }
+  ctx.restore();
+}
+
+
+/* --- pemandangan diam, digambar sekali tiap ganti ukuran layar --- */
 art.paintBackground = function (ctx, W, H) {
-  // langit
+  const u = Math.min(W, H) / 700 + 0.45;      // skala agar pas di layar kecil & besar
+  ctx.clearRect(0, 0, W, H);
+
+  /* langit */
   let g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#7ED4F2'); g.addColorStop(0.55, '#AEE8FA'); g.addColorStop(1, '#C9F0FF');
+  g.addColorStop(0.00, '#4FC3F0');
+  g.addColorStop(0.30, '#8FD9F6');
+  g.addColorStop(0.58, '#CDEEFB');
+  g.addColorStop(0.80, '#FBE3F0');
+  g.addColorStop(1.00, '#FFD9EA');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-  // matahari lembut
-  const sg = ctx.createRadialGradient(W * 0.80, H * 0.10, 10, W * 0.80, H * 0.10, W * 0.42);
-  sg.addColorStop(0, 'rgba(255,245,190,0.85)'); sg.addColorStop(1, 'rgba(255,245,190,0)');
+  /* cahaya matahari di pojok kanan atas */
+  const sg = ctx.createRadialGradient(W*0.84, H*0.07, 8, W*0.84, H*0.07, Math.max(W,H)*0.55);
+  sg.addColorStop(0.00, 'rgba(255,250,205,0.95)');
+  sg.addColorStop(0.25, 'rgba(255,245,190,0.35)');
+  sg.addColorStop(1.00, 'rgba(255,245,190,0)');
   ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
 
-  // bukit jauh
-  const hill = (yBase, amp, fill, line) => {
+  /* awan diam di kejauhan */
+  cloud(ctx, W*0.18, H*0.30, 26*u, 0.45);
+  cloud(ctx, W*0.74, H*0.36, 20*u, 0.38);
+
+  /* bukit berlapis */
+  const hill = (yBase, amp, phase, fill, line, dots) => {
     ctx.beginPath();
-    ctx.moveTo(-10, H);
-    ctx.lineTo(-10, yBase);
-    for (let x = -10; x <= W + 10; x += 12) {
-      const y = yBase + Math.sin(x / (W / 3.1) * Math.PI) * -amp + Math.sin(x / 90) * amp * 0.12;
+    ctx.moveTo(-20, H + 20);
+    ctx.lineTo(-20, yBase);
+    for (let x = -20; x <= W + 20; x += 8){
+      const y = yBase
+        - Math.sin(x / W * Math.PI * 1.15 + phase) * amp
+        - Math.sin(x / W * Math.PI * 3.1 + phase * 2) * amp * 0.26;
       ctx.lineTo(x, y);
     }
-    ctx.lineTo(W + 10, H); ctx.closePath();
+    ctx.lineTo(W + 20, H + 20); ctx.closePath();
     ctx.fillStyle = fill; ctx.fill();
-    ctx.strokeStyle = line; ctx.lineWidth = 3; ctx.stroke();
-  };
-  hill(H * 0.52, H * 0.10, '#F7B8D4', '#D2749F');
-  hill(H * 0.63, H * 0.07, '#E890B8', '#B85A8C');
-
-  // pohon lollipop
-  const tree = (x, y, r, c1, c2) => {
-    ctx.strokeStyle = '#F2E6D0'; ctx.lineWidth = r * 0.30; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + r * 2.4); ctx.stroke();
-    ctx.strokeStyle = '#C9B38F'; ctx.lineWidth = r * 0.06;
-    ctx.beginPath(); ctx.moveTo(x - r * 0.07, y + r * 0.3); ctx.lineTo(x - r * 0.07, y + r * 2.2); ctx.stroke();
-    ctx.save();
-    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.clip();
-    ctx.fillStyle = c1; ctx.fillRect(x - r, y - r, r * 2, r * 2);
-    ctx.fillStyle = c2;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath(); ctx.moveTo(x, y);
-      for (let k = 0; k <= 10; k++) {
-        const a = i * Math.PI / 3 + k / 10 * Math.PI / 3 + k * 0.10;
-        ctx.lineTo(x + Math.cos(a) * r * (k / 10) * 1.6, y + Math.sin(a) * r * (k / 10) * 1.6);
-      }
-      ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = line; ctx.lineWidth = 3.5; ctx.stroke();
+    if (dots){
+      ctx.save(); ctx.clip();
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      for (let y = yBase - amp; y < H; y += 13*u)
+        for (let x = (y % 2 ? 0 : 6*u); x < W; x += 13*u)
+          { ctx.beginPath(); ctx.arc(x, y, 1.5*u, 0, 7); ctx.fill(); }
+      ctx.restore();
     }
-    ctx.restore();
-    ctx.strokeStyle = '#C04A7C'; ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.stroke();
   };
-  tree(W * 0.10, H * 0.56, Math.min(34, W * 0.075), '#FFFFFF', '#FF6FA5');
-  tree(W * 0.90, H * 0.60, Math.min(28, W * 0.062), '#FFFFFF', '#6FC7FF');
-  tree(W * 0.26, H * 0.66, Math.min(22, W * 0.05), '#FFFFFF', '#FFD21C');
+  hill(H*0.52, H*0.085, 0.0, '#FBC6DE', '#E79BC2', true);
+  hill(H*0.63, H*0.065, 2.1, '#F2A0C8', '#D97BAB', true);
+  hill(H*0.74, H*0.050, 4.3, '#E27FB4', '#C45F96', false);
 
-  // lapisan frosting bawah
-  ctx.beginPath();
-  ctx.moveTo(0, H);
-  ctx.lineTo(0, H * 0.80);
-  for (let x = 0; x <= W; x += 10) ctx.lineTo(x, H * 0.80 + Math.sin(x / 70) * 12);
-  ctx.lineTo(W, H); ctx.closePath();
-  ctx.fillStyle = '#FFFFFF'; ctx.fill();
-  ctx.strokeStyle = '#E0D4F0'; ctx.lineWidth = 3; ctx.stroke();
-  // tetesan
-  for (let i = 0; i < 9; i++) {
-    const x = (i + 0.5) * W / 9, r = 9 + (i % 3) * 5;
-    ctx.beginPath(); ctx.arc(x, H * 0.80 + Math.sin(x / 70) * 12 + r * 0.6, r, 0, 7);
-    ctx.fillStyle = '#FFFFFF'; ctx.fill();
-    ctx.strokeStyle = '#E0D4F0'; ctx.lineWidth = 3; ctx.stroke();
+  /* pepohonan permen di punggung bukit */
+  const groundAt = (x, yBase, amp, phase) =>
+    yBase - Math.sin(x / W * Math.PI * 1.15 + phase) * amp
+          - Math.sin(x / W * Math.PI * 3.1 + phase * 2) * amp * 0.26;
+
+  const trees = [
+    [0.08, 30, '#FFFFFF', '#FF6FA5'], [0.21, 20, '#FFFFFF', '#6FC7FF'],
+    [0.46, 16, '#FFFFFF', '#FFD21C'], [0.69, 23, '#FFFFFF', '#9B6BE8'],
+    [0.90, 27, '#FFFFFF', '#41C94F'],
+  ];
+  for (const t of trees){
+    const x = W * t[0];
+    const r = t[1] * u;
+    const gy = groundAt(x, H*0.63, H*0.065, 2.1);
+    lolli(ctx, x, gy - r*2.3, r, t[2], t[3]);
+  }
+  candyCane(ctx, W*0.33, groundAt(W*0.33, H*0.74, H*0.050, 4.3) - 62*u, 62*u);
+  candyCane(ctx, W*0.80, groundAt(W*0.80, H*0.74, H*0.050, 4.3) - 48*u, 48*u);
+
+  const drops = [[0.14,'#FF8FB5','#D45383'],[0.28,'#8FD6FF','#4E9ED6'],[0.57,'#FFE07A','#D4A714'],
+                 [0.72,'#B79BFF','#7A5ACF'],[0.95,'#8FE6A6','#4BA866']];
+  for (const d of drops){
+    const x = W*d[0];
+    gumdrop(ctx, x, groundAt(x, H*0.74, H*0.050, 4.3) + 4*u, 13*u, d[1], d[2]);
   }
 
-  // butiran kertas
-  ctx.globalAlpha = 0.05;
-  for (let i = 0; i < 1400; i++) {
+  /* hamparan krim di bawah, lengkap dengan lelehannya */
+  const topY = H*0.845;
+  const edge = x => topY + Math.sin(x/90) * 9*u + Math.sin(x/37) * 3*u;
+  ctx.beginPath();
+  ctx.moveTo(-20, H + 20); ctx.lineTo(-20, edge(0));
+  for (let x = -20; x <= W + 20; x += 6) ctx.lineTo(x, edge(x));
+  ctx.lineTo(W + 20, H + 20); ctx.closePath();
+  const cg = ctx.createLinearGradient(0, topY - 20*u, 0, H);
+  cg.addColorStop(0, '#FFFFFF'); cg.addColorStop(1, '#F3E6FA');
+  ctx.fillStyle = cg; ctx.fill();
+
+  // lelehan menggantung
+  const dripW = 30*u;
+  for (let i = 0; i * dripW < W + dripW; i++){
+    const x = i*dripW + dripW*0.5;
+    const len = (14 + ((i*53) % 23)) * u;
+    const w = dripW * (0.30 + ((i*31) % 10)/36);
+    const y0 = edge(x);
+    ctx.beginPath();
+    ctx.moveTo(x - w, y0);
+    ctx.lineTo(x - w, y0 + len);
+    ctx.arc(x, y0 + len, w, Math.PI, 0, true);
+    ctx.lineTo(x + w, y0);
+    ctx.closePath();
+    ctx.fillStyle = '#FFFFFF'; ctx.fill();
+  }
+  ctx.strokeStyle = 'rgba(214,190,235,0.9)'; ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-20, edge(0));
+  for (let x = -20; x <= W + 20; x += 6) ctx.lineTo(x, edge(x));
+  ctx.stroke();
+
+  // meses warna-warni di atas krim
+  const sprinkle = ['#FF6FA5','#6FC7FF','#FFD21C','#9B6BE8','#41C94F','#FF8A1F'];
+  for (let i = 0; i < Math.round(W*H/9000); i++){
+    const x = Math.random()*W;
+    const y = edge(x) + 16*u + Math.random()*(H - edge(x) - 16*u);
+    if (y > H) continue;
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(Math.random()*Math.PI);
+    ctx.fillStyle = sprinkle[i % sprinkle.length];
+    ctx.globalAlpha = 0.75;
+    roundRect(ctx, -3.2*u, -1.1*u, 6.4*u, 2.2*u, 1.1*u); ctx.fill();
+    ctx.restore();
+  }
+
+  /* butiran kertas tipis di seluruh layar */
+  ctx.globalAlpha = 0.035;
+  for (let i = 0; i < 900; i++){
     ctx.fillStyle = i % 2 ? '#000' : '#fff';
-    ctx.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
+    ctx.fillRect(Math.random()*W, Math.random()*H, 1.6, 1.6);
   }
   ctx.globalAlpha = 1;
+};
+
+/* --- lapisan bergerak, digambar tiap frame di atas pemandangan diam --- */
+const ANIM_CLOUDS = [[0.10,0.13,30,0.85,1.0],[0.52,0.07,22,0.70,1.5],
+                     [0.86,0.19,26,0.78,0.7],[0.32,0.24,17,0.55,2.1]];
+art.drawBackdropAnim = function (ctx, W, H, t) {
+  const u = Math.min(W, H) / 700 + 0.45;
+
+  // awan hanyut pelan
+  for (let i = 0; i < ANIM_CLOUDS.length; i++){
+    const c = ANIM_CLOUDS[i];
+    const span = W + 300*u;
+    let x = (c[0]*W + t * 0.0062 * c[4]) % span;
+    if (x > W + 150*u) x -= span;
+    cloud(ctx, x, c[1]*H + Math.sin(t/2600 + i)*4*u, c[2]*u, c[3]);
+  }
+
+  // kilau berkelip di langit
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 16; i++){
+    const sx = ((i * 137.508) % 100) / 100 * W;
+    const sy = ((i * 61.803) % 100) / 100 * H * 0.72;
+    const ph = t / 760 + i * 0.83;
+    const k = Math.sin(ph);
+    if (k <= 0) continue;
+    const s = (2.2 + 2.4 * k) * u;
+    ctx.globalAlpha = 0.55 * k;
+    ctx.fillStyle = '#ffffff';
+    starPath(ctx, sx, sy, s * 2.6, s * 0.5, 4);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // gelembung permen melayang naik
+  ctx.save();
+  const cols = ['#FF6FA5','#6FC7FF','#FFD21C','#9B6BE8','#41C94F'];
+  for (let i = 0; i < 7; i++){
+    const life = (t / 9000 + i / 7) % 1;
+    const x = ((i * 97) % 100) / 100 * W + Math.sin(t/1800 + i*2) * 18*u;
+    const y = H * (1.04 - life * 1.12);
+    const r = (5 + (i % 3) * 2.4) * u;
+    ctx.globalAlpha = 0.30 * Math.sin(life * Math.PI);
+    const g2 = ctx.createRadialGradient(x - r*0.35, y - r*0.4, r*0.1, x, y, r);
+    g2.addColorStop(0, '#ffffff'); g2.addColorStop(1, cols[i % cols.length]);
+    ctx.fillStyle = g2;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+  }
+  ctx.restore();
 };
 
 /* ============================================================

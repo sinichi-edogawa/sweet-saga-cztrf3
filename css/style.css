@@ -65,48 +65,95 @@ button{font-family:var(--font); cursor:pointer}
 .epbar .icon:disabled{opacity:.35; box-shadow:0 4px 0 #35195c; cursor:default}
 .epinfo{
   flex:1; min-width:0; text-align:center; padding:6px 8px; border-radius:14px;
-  background:var(--panel); border:2px solid var(--panel-d); box-shadow:0 4px 0 #35195c;
+  background:linear-gradient(180deg,#8355C4,#5E329C);
+  border:2px solid var(--panel-d);
+  box-shadow:0 4px 0 #35195c, inset 0 1px 0 rgba(255,255,255,.25);
 }
 .epinfo b{display:block; font-size:16px; line-height:1.15; white-space:nowrap;
   overflow:hidden; text-overflow:ellipsis}
 .epinfo span{display:block; font-size:10.5px; opacity:.82; font-weight:700}
 
-.map-scroll{flex:1; overflow-y:auto; overflow-x:hidden; border-radius:18px;
-  -webkit-overflow-scrolling:touch; overscroll-behavior:contain}
+.map-scroll{
+  flex:1; overflow-y:auto; overflow-x:hidden; border-radius:18px;
+  -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  /* bagian paling atas dibuat memudar supaya simpul yang lewat di balik
+     bilah episode tidak terlihat terpotong mendadak */
+  -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 30px);
+  mask-image:linear-gradient(180deg, transparent 0, #000 30px);
+}
 
-.buildline{text-align:center; font-size:10px; font-weight:700; opacity:.55; padding-top:7px}
+.buildline{
+  text-align:center; font-size:10px; font-weight:800; padding-top:7px;
+  color:#8C5FBF; text-shadow:0 1px 0 rgba(255,255,255,.9), 0 0 6px rgba(255,255,255,.8);
+}
 .map-scroll::-webkit-scrollbar{width:0}
 .map-inner{position:relative; width:100%}
 #mapPath{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
 #mapNodes{position:relative; width:100%; height:100%}
 
 .node{
-  position:absolute; width:62px; height:62px; transform:translate(-50%,-50%);
+  position:absolute; width:64px; height:64px; transform:translate(-50%,-50%);
   border:0; padding:0; background:none;
 }
 .node .disc{
-  width:100%;height:100%;border-radius:50%;
-  display:grid;place-items:center; font-weight:800; font-size:21px; color:#5a3b12;
-  background:radial-gradient(circle at 34% 30%, #FFF0B0, #FFC32E 62%, #E79A00);
-  border:3px solid #fff; box-shadow:0 5px 0 #a86f00, 0 10px 18px rgba(0,0,0,.3);
+  position:relative; width:100%;height:100%;border-radius:50%;
+  display:grid;place-items:center; font-weight:800; font-size:23px; color:#70480c;
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255,255,255,.95) 0 9%, rgba(255,255,255,0) 46%),
+    linear-gradient(180deg,#FFEC9B 0%,#FFC93D 48%,#F09A00 100%);
+  border:3px solid #fff;
+  box-shadow:0 6px 0 #b3760a, 0 12px 20px rgba(70,25,95,.35),
+             inset 0 -5px 9px rgba(170,95,0,.30);
+  text-shadow:0 1px 0 rgba(255,255,255,.65);
+  transition:transform .12s;
 }
+.node:active .disc{transform:translateY(4px) scale(.96)}
 .node.locked .disc{
-  background:radial-gradient(circle at 34% 30%, #d9d3e6, #9c93b4 62%, #7a7190);
-  color:#4b4360; box-shadow:0 5px 0 #5d5572, 0 10px 18px rgba(0,0,0,.3);
+  color:#4b4360; font-size:19px;
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255,255,255,.75) 0 9%, rgba(255,255,255,0) 46%),
+    linear-gradient(180deg,#E4DEF0 0%,#ADA2C4 50%,#8A7FA6 100%);
+  border-color:rgba(255,255,255,.75);
+  box-shadow:0 6px 0 #6b6186, 0 12px 20px rgba(70,25,95,.28),
+             inset 0 -5px 9px rgba(80,65,110,.28);
+  text-shadow:none;
 }
-.node.current .disc{animation:bob 1.1s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.07)}}
+.node.done .disc{
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255,255,255,.95) 0 9%, rgba(255,255,255,0) 46%),
+    linear-gradient(180deg,#A8F0B6 0%,#4FD07A 48%,#2BA355 100%);
+  color:#0f4a24; box-shadow:0 6px 0 #1e7d41, 0 12px 20px rgba(70,25,95,.33),
+             inset 0 -5px 9px rgba(20,110,55,.30);
+}
+.node.current{z-index:3}
+.node.current .disc{
+  animation:bob 1.15s ease-in-out infinite;
+  box-shadow:0 6px 0 #b3760a, 0 0 0 5px rgba(255,214,60,.35),
+             0 0 26px rgba(255,214,60,.65), inset 0 -5px 9px rgba(170,95,0,.30);
+}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.08)}}
 .node .stars{
-  position:absolute; left:50%; bottom:-12px; transform:translateX(-50%);
-  display:flex; gap:1px; filter:drop-shadow(0 2px 2px rgba(0,0,0,.35));
+  position:absolute; left:50%; bottom:-11px; transform:translateX(-50%);
+  display:flex; gap:2px; filter:drop-shadow(0 2px 2px rgba(60,20,80,.45));
 }
-.node .stars i{width:14px;height:14px;background:#8a82a0;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
-.node .stars i.on{background:var(--gold)}
+.node .stars i{
+  width:17px;height:17px; background:#A79BC4;
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+}
+.node .stars i.on{background:linear-gradient(180deg,#FFF0A8,#FFC02E)}
 .node .flag{
-  position:absolute; top:-26px; left:50%; transform:translateX(-50%);
-  background:#ff4f87; color:#fff; font-size:10px; font-weight:800; padding:3px 8px;
-  border-radius:9px; white-space:nowrap; border:2px solid #b6265a;
+  position:absolute; top:-29px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(180deg,#FF84AC,#EA3A73);
+  color:#fff; font-size:10px; font-weight:800; letter-spacing:.6px;
+  padding:4px 10px; border-radius:10px; white-space:nowrap;
+  border:2px solid #fff; box-shadow:0 3px 8px rgba(70,25,95,.4);
+  animation:flagbob 1.15s ease-in-out infinite;
 }
+.node .flag::after{
+  content:''; position:absolute; left:50%; bottom:-7px; transform:translateX(-50%);
+  border:5px solid transparent; border-top-color:#fff;
+}
+@keyframes flagbob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,-4px)}}
 
 /* ---------- HUD permainan ---------- */
 .hud{display:flex; align-items:center; gap:8px; padding:2px 0 8px}
@@ -205,10 +252,22 @@ button{font-family:var(--font); cursor:pointer}
 }
 .modal.show{display:flex}
 .card{
-  width:min(100%,380px); border-radius:24px; padding:22px 20px 20px; text-align:center;
-  background:linear-gradient(180deg,#7E4CB8,#582E8E);
-  border:3px solid #FFD98A; box-shadow:0 18px 50px rgba(0,0,0,.6);
+  position:relative; width:min(100%,380px); border-radius:26px;
+  padding:24px 20px 20px; text-align:center; overflow:hidden;
+  background:
+    radial-gradient(130% 55% at 50% -6%, rgba(255,255,255,.26), rgba(255,255,255,0) 62%),
+    linear-gradient(180deg,#9560D4 0%,#7445B6 45%,#4F2787 100%);
+  border:4px solid #FFD98A;
+  box-shadow:0 20px 54px rgba(20,5,45,.65), inset 0 2px 0 rgba(255,255,255,.35),
+             inset 0 -6px 14px rgba(30,8,60,.45);
   animation:cardIn .3s cubic-bezier(.2,1.5,.5,1);
+}
+/* pita manis di tepi atas kartu */
+.card::before{
+  content:''; position:absolute; left:-10%; right:-10%; top:-14px; height:26px;
+  background:
+    radial-gradient(closest-side, #FFD98A 92%, transparent 95%) 0 0/26px 26px repeat-x;
+  opacity:.9; pointer-events:none;
 }
 @keyframes cardIn{from{opacity:0;transform:scale(.8) translateY(20px)}to{opacity:1;transform:none}}
 .card h2{
@@ -222,6 +281,18 @@ button{font-family:var(--font); cursor:pointer}
 .card .acts{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px}
 .card .goals{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:12px 0}
 .card .goals .obj{font-size:15px}
+/* tiga ambang bintang pada kartu pembuka level */
+.startstars{display:flex; gap:14px; justify-content:center; align-items:flex-end; margin:14px 0 4px}
+.startstars div{display:flex; flex-direction:column; align-items:center; gap:3px}
+.startstars i{
+  width:30px;height:30px;
+  background:linear-gradient(180deg,#FFF0A8,#FFC02E);
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  filter:drop-shadow(0 2px 2px rgba(30,8,60,.5));
+}
+.startstars div:nth-child(2) i{width:34px;height:34px}
+.startstars div:nth-child(3) i{width:38px;height:38px}
+.startstars span{font-size:12px; font-weight:800; opacity:.95; font-variant-numeric:tabular-nums}
 .bigstars{display:flex; gap:6px; justify-content:center; margin:8px 0 4px}
 .bigstars i{width:46px;height:46px;background:#6B5B7A;
   clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
